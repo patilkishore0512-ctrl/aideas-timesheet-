@@ -1,0 +1,20 @@
+{
+    "100269": {
+        "password": "00ac4670265145334ce0194d2428239107ac43fa3ca6c7415f27e5def0b4fb7a",
+        "is_admin": true,
+        "name": "Santhosh N",
+        "email": "santhosh.n@in.abb.com"
+    },
+    "100298": {
+        "password": "14499fd93d84cba1e3dc1b581a105f9eab55a0de7ca126117d631e484fb8cfb6",
+        "is_admin": false,
+        "name": "kishore patil",
+        "email": "kishore.patil@in.abb.com"
+    },
+    "100300": {
+        "password": "5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5",
+        "is_admin": false,
+        "name": "Sooraj S",
+        "email": "sooraj.s@in.abb.com"
+    }
+}

@@ -1,0 +1,8 @@
+streamlit
+pandas
+pillow
+reportlab 
+python-dateutil
+pathlib
+base64io
+
