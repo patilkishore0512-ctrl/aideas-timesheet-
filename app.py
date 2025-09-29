@@ -12,7 +12,6 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, 
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 from io import BytesIO
-from auth_systems import auth_wrapper, load_users
 import urllib.parse
 
 HOLIDAYS_2025 = {
@@ -311,7 +310,7 @@ def save_and_open_email(recipient_email, month_year, employee_data, df, has_scre
 
 As per above mentioned I am submitting my timesheet for {calendar.month_name[month_year[0]]} - {month_year[1]} and kindly request your approval.
 
-Please find attached my completed timesheet{f" with screenshots" if has_screenshots else ""}. 
+Please find attached my completed timesheet{f" with screenshots" if has_screenshots else ""}. After this email opens in Outlook, please attach the downloaded PDF.
 
 I have carefully recorded all my work hours, including:
 1. Work From Office (WFO) days: {wfo_days} Days
@@ -338,6 +337,11 @@ def calculate_metrics(df):
     return working_days, sick_leaves, earned_leaves, wfh_days, wfo_days
 
 def main():
+    st.set_page_config(
+        page_title="Aideas Timesheet",
+        page_icon="aideas_logo.png"
+    )
+    
     st.title("Aideas Timesheet Generator - 2025")
     
     # Initialize session state
@@ -348,29 +352,16 @@ def main():
     if 'screenshots' not in st.session_state:
         st.session_state.screenshots = []
     
-    # Get current user's data
-    try:
-        users = load_users()
-        current_user_id = st.session_state.current_user
-        if current_user_id not in users:
-            st.error("User does not exist in the system.")
-            return
-        current_user = users[current_user_id]
-        if 'name' not in current_user:
-            st.error("User profile is incomplete.")
-            return
-    except Exception as e:
-        st.error("Error loading user data.")
-        return
-    
     # Employee Information
     st.header("Employee Information")
     col1, col2 = st.columns(2)
     with col1:
-        st.text_input("Employee Name", value=current_user.get('name', ''), disabled=True, key="main_emp_name")
-        st.text_input("Employee ID", value=current_user_id, disabled=True, key="main_emp_id")
+        employee_name = st.text_input("Employee Name", key="main_emp_name")
+        employee_id = st.text_input("Employee ID", key="main_emp_id")
+    
     location = "ABB Southfield"
     manager = "Nikhil M"
+    
     with col2:
         st.text_input("Work Location", value=location, disabled=True, key="main_location")
         st.text_input("Manager", value=manager, disabled=True, key="main_manager")
@@ -453,10 +444,13 @@ def main():
             projects.append(project)
     
     if st.button("Generate Timesheet", key="generate_btn"):
+        if not employee_name or not employee_id:
+            st.error("Please enter Employee Name and Employee ID")
+            return
         if not projects:
             st.error("Please add at least one project description")
             return
-        employee_data = {"name": current_user.get('name', ''), "id": current_user_id, "location": location, "manager": manager}
+        employee_data = {"name": employee_name, "id": employee_id, "location": location, "manager": manager}
         st.session_state.timesheet_df = create_timesheet(2025, month, employee_data, projects, leave_dates, wfh_dates)
         st.session_state.timesheet_generated = True
         st.session_state.employee_data = employee_data
@@ -541,4 +535,4 @@ def main():
             st.info("After Outlook opens, please manually attach the downloaded PDF.")
 
 if __name__ == "__main__":
-    auth_wrapper(main)
+    main()
